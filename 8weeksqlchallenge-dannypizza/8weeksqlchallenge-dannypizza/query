@@ -1,0 +1,39 @@
+--A. Pizza Metrics
+--1. How many pizzas were ordered?
+SELECT COUNT(DISTINCT order_id) FROM customer_orders_cleaned;
+
+--2. How many unique customer orders were made
+SELECT customer_id, COUNT(order_id) AS unique_orders 
+FROM customer_orders_cleaned
+GROUP BY customer_id;
+
+--3. How many successful orders were delivered by each runner?
+SELECT runner_id, COUNT(*)
+FROM runner_orders_cleaned
+WHERE cancellation_cleaned IS NULL
+GROUP BY runner_id;
+
+--4. How many of each type of pizza was delivered?
+ SELECT p.pizza_name, COUNT(c.pizza_id)
+    FROM customer_orders_cleaned as c
+    JOIN runner_orders_cleaned as r
+    ON r.order_id = c.order_id
+    JOIN pizza_names as p
+    ON p.pizza_id = c.pizza_id
+    WHERE r.cancellation_cleaned IS NULL
+    GROUP BY p.pizza_name;
+
+--5. How many Vegatarian and Meatlovers were ordered by each customer?
+SELECT c.customer_id, p.pizza_name, COUNT(p.pizza_name)
+FROM customer_orders_cleaned AS c
+JOIN pizza_names AS p ON p.pizza_id=c.pizza_id
+GROUP BY c.customer_id, p.pizza_name
+ORDER BY c.customer_id;
+
+--6. What was the maximum number of pizzas delivered in a single order?
+SELECT MAX(pizza_count) AS max_pizzas
+FROM (
+    SELECT order_id, COUNT(pizza_id) AS pizza_count
+    FROM customer_orders_cleaned
+    GROUP BY order_id
+) AS order_counts;
